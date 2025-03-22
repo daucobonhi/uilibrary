@@ -2141,7 +2141,7 @@ function DragonLib:Start(GuiConfig)
                     end
                 end
                 function DropdownFunc:Set(Value)
-                    DropdownFunc.Value = Value or DropdownFunc.Value
+                    DropdownFunc.Value = type(Value) == "table" and Value or {}
                     for _, Drop in ScrollUnder:GetChildren() do
                         if Drop.Name ~= "UIListLayout" and not table.find(DropdownFunc.Value, Drop.OptionText.Text) then
                             Drop.ChoosingFrame.AnchorPoint = Vector2.new(0, 1)
@@ -2182,12 +2182,16 @@ function DragonLib:Start(GuiConfig)
                         end
                     end
                     local DropdownValueTable = table.concat(DropdownFunc.Value, ", ")
+                    DropdownBox.Text = DropdownValueTable ~= "" and DropdownValueTable or DropdownConfig["Place Holder Text"]
+
                     if DropdownValueTable == "" then
                         DropdownBox.Text = ""
                     else
                         DropdownBox.Text = tostring(DropdownValueTable)
                     end
-                    DropdownConfig.Callback(DropdownFunc.Value)
+                    if DropdownConfig.Callback and typeof(DropdownConfig.Callback) == "function" then
+						DropdownConfig.Callback(table.unpack(DropdownFunc.Value))
+					end
                 end
                 function DropdownFunc:Add(OptionName)
                     local OptionName = OptionName or "Option"
